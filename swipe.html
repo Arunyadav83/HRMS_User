@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Swipes Information</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .modal-content {
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        .modal-header {
+            background-color: #f8f9fa;
+            border-bottom: none;
+            padding: 15px 20px;
+        }
+        .modal-header h5 {
+            font-weight: 600;
+        }
+        .modal-header .close {
+            margin: -15px -20px -15px auto;
+        }
+        .table td, .table th {
+            border-top: none;
+            padding: 0.5rem;
+        }
+        .table th {
+            background-color: #f1f7ff;
+        }
+        .table tbody tr {
+            background-color: #eaf4ff;
+        }
+    </style>
+</head>
+<body>
+
+<!-- Trigger button -->
+<button type="button" class="btn btn-primary" id="openModalBtn">
+    Show Swipe Information
+</button>
+
+<!-- Modal Structure -->
+<div class="modal fade" id="swipeModal" tabindex="-1" aria-labelledby="swipeModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="swipeModalLabel">Swipes</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="d-flex justify-content-between">
+                    <div>Date: 26 Aug, 2024</div>
+                    <div>Shift Time: 09:30 to 18:30</div>
+                    <div>Shift Type: GEN</div>
+                </div>
+                <table class="table mt-3">
+                    <thead>
+                        <tr>
+                            <th>Swipe Time</th>
+                            <th>Door/Address</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>10:34:34</td>
+                            <td>-</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Bootstrap JS and jQuery -->
+<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    // Onclick functionality to open the modal
+    document.getElementById('openModalBtn').onclick = function() {
+        $('#swipeModal').modal('show');
+    };
+</script>
+</body>
+</html>
