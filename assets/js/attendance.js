@@ -29,7 +29,7 @@ async function fetchAttendanceList() {
         .then(data => {
             punchRecordsByDay = data;
             console.log(punchRecordsByDay);
-            
+
             loadActivities();
             displayPunchRecords()
         })
@@ -95,6 +95,27 @@ function handlePunchOut() {
             // First fetch updated attendance data
             return fetchAttendanceList().then(() => {
                 togglePunchButtons(false);
+            });
+        })
+        .catch(handleError);
+}
+
+function handleOvertimeUpdate(overtime) {
+    const attendanceId = localStorage.getItem("attendanceId");
+
+    fetch(`${BASE_URL}/${attendanceId}`, {
+        method: "PUT",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify(overtime),
+    })
+        .then(handleResponse)
+        .then(async (data) => {
+            // First fetch updated attendance data
+            return fetchAttendanceList().then(() => {
+                startWorkTimer();
+                updateWorkingTimeDisplay();
             });
         })
         .catch(handleError);
@@ -184,6 +205,15 @@ function startWorkTimer() {
     workInterval = setInterval(() => {
         // Update work duration based on whether it's resumed
         workDuration += 1; // Increment work duration by 1 second
+
+        // Check if work duration exceeds total work hours and is at a 30-minute interval
+        if (workDuration > totalWorkHours) {
+            const overtimeSeconds = workDuration - totalWorkHours;
+            // Check if we've hit a 30-minute interval (1800 seconds)
+            if (overtimeSeconds % 1800 === 0) {
+                handleOvertimeUpdate({ overtime: overtimeSeconds });
+            }
+        }
 
         // Update the display
         updateWorkingTimeDisplay();
@@ -283,7 +313,7 @@ function calculateTotalBreakDuration(breaksList) {
 
 // Show punch records in table 
 function displayPunchRecords() {
-    punchRecordsByDay.forEach((dayRecords, index) => {
+    punchRecordsByDay.reverse().forEach((dayRecords, index) => {
         addPunchLogEntry(
             index,
             dayRecords?.date,
@@ -291,7 +321,7 @@ function displayPunchRecords() {
             dayRecords?.punchRecords[dayRecords?.punchRecords?.length - 1]?.punchoutTime,
             calculateTotalWorkDuration(dayRecords?.punchRecords),
             calculateTotalBreakDuration(dayRecords?.breaksList),
-            calculateTotalWorkDuration(dayRecords?.punchRecords) - totalWorkHours,
+            dayRecords?.overtime,
             totalWorkHours
         );
     });
@@ -368,7 +398,7 @@ function addPunchLogEntry(index, date, punchinTime, punchoutTime, workDuration, 
             <td>${formattedPunchOut}</td>
             <td>${formatDuration(workDuration)}</td>
             <td>${formatDuration(breakDuration)}</td>
-            <td>${formatOverTime(overtime, totalWorkHours)}</td>
+            <td>${formatOverTime(overtime)}</td>
         `;
         punchLog.appendChild(newRow);
     } else {
@@ -378,7 +408,7 @@ function addPunchLogEntry(index, date, punchinTime, punchoutTime, workDuration, 
         existingRow.cells[3].innerText = formattedPunchOut;
         existingRow.cells[4].innerText = `${formatDuration(workDuration)}`;
         existingRow.cells[5].innerText = `${formatDuration(breakDuration)}`;
-        existingRow.cells[6].innerText = `${formatOverTime(overtime, totalWorkHours)}`;
+        existingRow.cells[6].innerText = `${formatOverTime(overtime)}`;
     }
 }
 
@@ -397,11 +427,11 @@ function formatDuration(time) {
 }
 
 // Function to calculate overtime based on work duration in seconds
-function formatOverTime(workDurationInSeconds, totalWorkHours) {
-    const overtimeSeconds = Math.max(0, workDurationInSeconds - totalWorkHours); // Only positive overtime
-
-    const overtimeHours = Math.floor(overtimeSeconds / 3600);
-    const overtimeMinutes = Math.floor((overtimeSeconds % 3600) / 60);
+function formatOverTime(overtime) {    
+    if (!overtime || overtime < 0) return "00 Hrs : 00 Mins";
+    
+    const overtimeHours = Math.floor(overtime / 3600);
+    const overtimeMinutes = Math.floor((overtime % 3600) / 60);
 
     return `${padZero(overtimeHours)} Hrs : ${padZero(overtimeMinutes)} Mins`;
 }
@@ -439,7 +469,7 @@ function searchAttendance() {
                 <td class="punch-out">${formatTime(record.punchRecords[record.punchRecords.length - 1].punchoutTime)}</td>
                 <td class="work-duration">${formatDuration(calculateTotalWorkDuration(record.punchRecords))}</td>
                 <td class="break-duration">${formatDuration(calculateTotalBreakDuration(record.breaksList))}</td>
-                <td class="overtime">${formatOverTime(calculateTotalWorkDuration(record.punchRecords), totalWorkHours)}</td>
+                <td class="overtime">${formatOverTime(record.overtime)}</td>
             `;
 
             punchLog.appendChild(newRow); // Add the new row to the punch-log table body

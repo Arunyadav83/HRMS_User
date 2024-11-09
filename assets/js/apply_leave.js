@@ -1,6 +1,6 @@
 // Constants
 const LEAVE_BASE_URL = "http://localhost:8082/api/leaves";
-const employeeId = localStorage.getItem("employeeId");
+const empID = localStorage.getItem("employeeId");
 const adminId = localStorage.getItem("adminId");
 
 // State variables
@@ -12,7 +12,6 @@ let toDate = new Date();
 document.addEventListener('DOMContentLoaded', function () {
     fetchLeavesList().then(initializeDateInputs).catch(error => {
         console.error("Initialization error:", error);
-        showError("Failed to initialize page data.");
     });
 });
 
@@ -84,7 +83,7 @@ function collectFormData() {
         session1: document.getElementById("fromSession").value,
         session2: document.getElementById("toSession").value,
         remainingLeaves: document.getElementById("remainingLeaves").value,
-        assignedBy: employeeId,
+        assignedBy: empID,
         approvedBy: adminId
     };
 }
@@ -96,7 +95,7 @@ async function submitLeaveApplication(leaveData) {
     try {
         showLoadingIndicator();
 
-        const response = await fetch(`${LEAVE_BASE_URL}/leave/${employeeId}`, {
+        const response = await fetch(`${LEAVE_BASE_URL}/leave/${empID}`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(leaveData)

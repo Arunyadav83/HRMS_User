@@ -125,11 +125,9 @@ function calculateProgress(attendanceArray) {
             holiday.holidayDate === entryDate
         );
 
-        // Calculate overtime for this day if worked more than 9 hours
-        if (entryDateStr >= monthStartStr && entryDateStr <= monthEndStr) {
-            if (!isWeekend && !isHoliday && entryWorkedHours > 9) {
-                overtimeHours += (entryWorkedHours - 9);
-            }
+        // Convert overtime from seconds to hours
+        if (attendance.overtime) {
+            overtimeHours += attendance.overtime / 3600; // Convert seconds to hours
         }
 
         if (isWeekday && !isHoliday) {
