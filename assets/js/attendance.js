@@ -28,6 +28,8 @@ async function fetchAttendanceList() {
         .then(response => response.json())
         .then(data => {
             punchRecordsByDay = data;
+            console.log(punchRecordsByDay);
+            
             loadActivities();
             displayPunchRecords()
         })

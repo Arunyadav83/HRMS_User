@@ -21,7 +21,7 @@ document.getElementById("getAttendanceBtn").addEventListener('click', function (
             }
         })
         .then(data => {
-            console.log("Attendance Data:", data);
+            // console.log("Attendance Data:", data);
             document.getElementById("attendanceDataDiv").style.display = "block";
             document.getElementById("attendanceData").textContent = JSON.stringify(data, null, 2);
         })
